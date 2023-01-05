@@ -1,5 +1,4 @@
-Chapter 2 - Creating Models with SQLAlchemy
-===========================================
+Flask Blog Tutorial with Architecture
 
 To run the application
 ----------------------
