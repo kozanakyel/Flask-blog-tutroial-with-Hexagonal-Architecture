@@ -20,7 +20,6 @@ tags = db.Table(
 
 class User(db.Model):
     #__tablename__ = 'User'
-
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(255), nullable=False, index=True, unique=True)
     password = db.Column(db.String(255))
