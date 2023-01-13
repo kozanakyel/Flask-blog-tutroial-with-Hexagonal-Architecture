@@ -7,7 +7,8 @@ fi
 source venv/bin/activate
 
 pip install -r requirements.txt
-export FLASP_APP=main.py
+
+export FLASK_APP=main.py
 if [ ! -d "migrations" ]; then
     echo --------------------
     echo INIT THE migrations folder
@@ -24,10 +25,9 @@ echo --------------------
 echo --------------------
 echo This is the DDL code that will be run
 echo --------------------
-flask db upgrade --sql
 flask db upgrade
 echo --------------------
-echo Show database tables
+echo Generating test data
 echo --------------------
-sqlite3 database.db .tables
+python test_data.py
 

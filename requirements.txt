@@ -2,3 +2,4 @@ Flask
 Flask-sqlalchemy
 Flask-Migrate
 psycopg2-binary
+Faker
