@@ -206,8 +206,33 @@ class GenericListView(View):
                    'columns': self.columns}
         return self.render_template(context=context)
     
+app.add_url_rule(
+    '/generic_posts', view_func=GenericListView.as_view(
+        'generic_posts', model=Post
+    )
+)
 
-        
+app.add_url_rule(
+    '/generic_users', view_func=GenericListView.as_view(
+        'generic_users', model=User
+    )
+)
+
+app.add_url_rule(
+    '/generic_comments', view_func=GenericListView.as_view(
+        'generic_comments', model=Comment
+    )
+)
+      
+app.register_blueprint(blog_blueprint)
+
+@app.errorhandler(404) 
+def page_not_found(error):
+    return render_template('404.html'), 404
+
+@app.before_request
+def before_request():
+    session['page_loads'] = session.get('page_loads', 0) + 1 
         
 if __name__ == '__main__':
     app.run()
