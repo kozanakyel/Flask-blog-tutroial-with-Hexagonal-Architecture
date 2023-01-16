@@ -26,7 +26,7 @@ def sidebar_data():
 def home(page=1):
     posts = Post.query.order_by(Post.publish_date.desc()).paginate(
         page=page, 
-        per_page=app.config.get('POSTS_PER_PAGE', 10), 
+        per_page=current_app.config.get('POSTS_PER_PAGE', 10), 
         error_out=False
     )
     recent, top_tags = sidebar_data()
