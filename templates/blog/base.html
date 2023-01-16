@@ -19,6 +19,13 @@
             {% endblock %}
         </div>
     </div>
+
+    <div class="p-4 shadow-sm">
+        <div class="row">
+            Session: {{ session }} Global: {{ g.random_key }} Request: {{ request }}
+        </div>
+    </div>
+
     {% include 'messages.html' %}
     {% block body %}
     <div class="row">
