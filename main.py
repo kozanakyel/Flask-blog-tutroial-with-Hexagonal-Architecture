@@ -1,6 +1,5 @@
 import datetime
-
-from flask import Flask, render_template, flash, redirect, url_for
+from flask import Flask, render_template, flash, redirect, url_for, Blueprint, session, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf import FlaskForm as Form
@@ -8,6 +7,7 @@ from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length
 from config import DevConfig
 from sqlalchemy import func, desc
+from flask.views import View
 
 app = Flask(__name__)
 app.config.from_object(DevConfig)
@@ -18,6 +18,13 @@ tags = db.Table(
     'post_tags',
     db.Column('post_id', db.Integer, db.ForeignKey('post.id')),
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
+)
+
+blog_blueprint = Blueprint(
+    'blog',
+    __name__,
+    template_folder='templates/blog',
+    url_prefix='/blog'
 )
 
 
@@ -102,7 +109,12 @@ def sidebar_data():
 
 
 @app.route('/')
-@app.route('/<int:page>')
+def index():
+    return redirect(url_for('blog.home'))
+
+
+@blog_blueprint.route('/')
+@blog_blueprint.route('/<int:page>')
 def home(page=1):
     posts = Post.query.order_by(Post.publish_date.desc()).paginate(page=page, per_page=app.config.get('POSTS_PER_PAGE', 10), error_out=False)
     recent, top_tags = sidebar_data()
@@ -114,7 +126,7 @@ def home(page=1):
         top_tags=top_tags
     )
 
-@app.route('/post/<int:post_id>', methods=('GET', 'POST'))
+@blog_blueprint.route('/post/<int:post_id>', methods=('GET', 'POST'))
 def post(post_id):
     form = CommentForm()
     if form.validate_on_submit():
@@ -147,7 +159,7 @@ def post(post_id):
         form=form
     )
     
-@app.route('/posts_by_tag/<string:tag_name>')
+@blog_blueprint.route('/posts_by_tag/<string:tag_name>')
 def posts_by_tag(tag_name):
     tag = Tag.query.filter_by(title=tag_name).first_or_404()
     posts = tag.posts.order_by(Post.publish_date.desc()).all()
@@ -162,7 +174,7 @@ def posts_by_tag(tag_name):
     )
 
 
-@app.route('/posts_by_user/<string:username>')
+@blog_blueprint.route('/posts_by_user/<string:username>')
 def posts_by_user(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = user.posts.order_by(Post.publish_date.desc()).all()
@@ -175,6 +187,27 @@ def posts_by_user(username):
         recent=recent,
         top_tags=top_tags
     )
+    
+class GenericListView(View):
+    def __init__(self, model, list_template='generic_list.html'):
+        self.model = model
+        self.list_template = list_template
+        self.columns = self.model.__mapper__.columns.keys()
+        super(GenericListView, self).__init__()
+        
+    def render_template(self, context):
+        return render_template(self.list_template, **context)
+    
+    def get_objects(self):
+        return self.model.query.all()
+    
+    def dispatch_request(self):
+        context = {'objects': self.get_objects(),
+                   'columns': self.columns}
+        return self.render_template(context=context)
+    
 
+        
+        
 if __name__ == '__main__':
     app.run()
