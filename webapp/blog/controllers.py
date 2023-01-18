@@ -15,6 +15,7 @@ def sidebar_data():
         Post.publish_date.desc()
     ).limit(5).all()
 
+    # some abstract notifications for fetching last tags
     top_tags = db.session.query(
         Tag, func.count(tags.c.post_id).label('total')
     ).join(tags).group_by(Tag).order_by(desc('total')).limit(5).all()
@@ -24,6 +25,7 @@ def sidebar_data():
 @blog_blueprint.route('/')
 @blog_blueprint.route('/<int:page>')
 def home(page=1):
+    # paginate 10 by 10 for each page
     posts = Post.query.order_by(Post.publish_date.desc()).paginate(
         page=page, 
         per_page=current_app.config.get('POSTS_PER_PAGE', 10), 
