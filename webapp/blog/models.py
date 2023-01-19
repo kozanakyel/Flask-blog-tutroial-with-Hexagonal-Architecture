@@ -7,22 +7,6 @@ tags = db.Table(
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
 )
 
-class User(db.Model):
-    #__tablename__ = 'User'
-    id = db.Column(db.Integer(), primary_key=True)
-    username = db.Column(db.String(255)) #, nullable=False, index=True, unique=True
-    password = db.Column(db.String(255))
-    posts = db.relationship('Post', backref='user', lazy='dynamic')
-
-    def __init__(self, username=""):
-        self.username = username
-
-    def __repr__(self):
-        # formats what is shown in the shell when print is
-        # called on it
-        return '<User {}>'.format(self.username)
-
-
 class Post(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     title = db.Column(db.String(255))   #, nullable=False

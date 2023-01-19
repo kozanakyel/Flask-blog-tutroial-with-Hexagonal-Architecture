@@ -10,15 +10,17 @@ def page_not_found(error):
 
 def create_app(object_name):
     
-    from .blog.controllers import blog_blueprint
-    from .main.controllers import main_blueprint
-    
     app = Flask(__name__)
     app.config.from_object(object_name)
     
     db.init_app(app)
     migrate.init_app(app, db)
-    app.register_blueprint(main_blueprint)
-    app.register_blueprint(blog_blueprint)
+    
+    from .auth import create_module as auth_create_module
+    from .blog import create_module as blog_create_module
+    from .main import create_module as main_create_module
+    auth_create_module(app)
+    blog_create_module(app)
+    main_create_module(app)
     app.register_error_handler(404, page_not_found)
     return app
