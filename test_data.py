@@ -3,7 +3,7 @@ import random
 from faker import Faker
 from webapp import create_app
 from webapp import db
-from webapp.auth.models import User  #, Role
+from webapp.auth.models import User, Role
 from webapp.blog.models import Post, Tag
 from webapp.auth import bcrypt
 from config import DevConfig
@@ -46,7 +46,6 @@ def generate_tags(n):
     return tags
 
 
-"""
 def generate_roles():
     roles = list()
     for rolename in fake_roles:
@@ -63,8 +62,6 @@ def generate_roles():
             log.error("Erro inserting role: %s, %s" % (str(role),e))
             db.session.rollback()
     return roles
-"""
-
 
 def generate_users():
     users = list()
@@ -74,8 +71,8 @@ def generate_users():
             users.append(user)
             continue
         user = User()
-        #poster = Role.query.filter_by(name=item['role']).one()
-        #user.roles.append(poster)
+        poster = Role.query.filter_by(name=item['role']).one()
+        user.roles.append(poster)
         user.username = item['username']
         user.password = bcrypt.generate_password_hash("password")
         users.append(user)
@@ -103,5 +100,5 @@ def generate_posts(n, users, tags):
             log.error("Fail to add post %s: %s" % (str(post), e))
             db.session.rollback()
 
-#generate_roles()
+generate_roles()
 generate_posts(100, generate_users(), generate_tags(5))

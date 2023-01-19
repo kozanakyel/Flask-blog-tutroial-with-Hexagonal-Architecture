@@ -22,5 +22,4 @@ def create_app(object_name):
     auth_create_module(app)
     blog_create_module(app)
     main_create_module(app)
-    app.register_error_handler(404, page_not_found)
     return app

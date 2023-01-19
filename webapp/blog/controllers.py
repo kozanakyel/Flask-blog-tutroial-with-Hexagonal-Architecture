@@ -1,50 +1,49 @@
+import datetime
 from sqlalchemy import desc, func
 from flask import render_template, Blueprint, flash, redirect, url_for, current_app, abort
-from .models import db, Post, Tag, Comment, tags 
-from .forms import CommentForm, PostForm
 from flask_login import login_required, current_user
+from .models import db, Post, Tag, Comment, tags
+
+from .forms import CommentForm, PostForm
 from ..auth.models import User
-import datetime
+from ..auth import has_role
 
 blog_blueprint = Blueprint(
     'blog',
     __name__,
     template_folder='../templates/blog',
-    url_prefix='/blog'
+    url_prefix="/blog"
 )
 
-def sidebar_data():
-    recent = Post.query.order_by(
-        Post.publish_date.desc()
-    ).limit(5).all()
 
-    # some abstract notifications for fetching last tags
+def sidebar_data():
+    recent = Post.query.order_by(Post.publish_date.desc()).limit(5).all()
     top_tags = db.session.query(
         Tag, func.count(tags.c.post_id).label('total')
     ).join(tags).group_by(Tag).order_by(desc('total')).limit(5).all()
 
     return recent, top_tags
 
+
 @blog_blueprint.route('/')
 @blog_blueprint.route('/<int:page>')
 def home(page=1):
-    # paginate 10 by 10 for each page
-    posts = Post.query.order_by(Post.publish_date.desc()).paginate(
-        page=page, 
-        per_page=current_app.config.get('POSTS_PER_PAGE', 10), 
-        error_out=False
-    )
+    posts = Post.query.order_by(Post.publish_date.desc()).paginate(page=page,
+                                                                   per_page=current_app.config.get('POSTS_PER_PAGE', 10),
+                                                                   error_out=False)
     recent, top_tags = sidebar_data()
-    
+
     return render_template(
         'home.html',
         posts=posts,
         recent=recent,
         top_tags=top_tags
     )
-    
+
+
 @blog_blueprint.route('/new', methods=['GET', 'POST'])
 @login_required
+@has_role('poster')
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
@@ -57,6 +56,7 @@ def new_post():
         flash('Post added', 'info')
         return redirect(url_for('.post', post_id=new_post.id))
     return render_template('new.html', form=form)
+
 
 @blog_blueprint.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -77,9 +77,11 @@ def edit_post(id):
         return render_template('edit.html', form=form, post=post)
     abort(403)
 
+
 @blog_blueprint.route('/post/<int:post_id>', methods=('GET', 'POST'))
 def post(post_id):
     form = CommentForm()
+
     if form.validate_on_submit():
         new_comment = Comment()
         new_comment.name = form.name.data
@@ -93,13 +95,13 @@ def post(post_id):
             db.session.rollback()
         else:
             flash('Comment added', 'info')
-        return redirect(url_for('blog.post', post_id=post_id))    # redirect return, you should consider view path position
-    
+        return redirect(url_for('blog.post', post_id=post_id))
+
     post = Post.query.get_or_404(post_id)
     tags = post.tags
     comments = post.comments.order_by(Comment.date.desc()).all()
     recent, top_tags = sidebar_data()
-    
+
     return render_template(
         'post.html',
         post=post,
@@ -109,8 +111,9 @@ def post(post_id):
         top_tags=top_tags,
         form=form
     )
-    
-@blog_blueprint.route('/posts_by_tag/<string:tag_name>')
+
+
+@blog_blueprint.route('/tag/<string:tag_name>')
 def posts_by_tag(tag_name):
     tag = Tag.query.filter_by(title=tag_name).first_or_404()
     posts = tag.posts.order_by(Post.publish_date.desc()).all()
@@ -125,7 +128,7 @@ def posts_by_tag(tag_name):
     )
 
 
-@blog_blueprint.route('/posts_by_user/<string:username>')
+@blog_blueprint.route('/user/<string:username>')
 def posts_by_user(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = user.posts.order_by(Post.publish_date.desc()).all()
