@@ -1,10 +1,13 @@
 import logging
-from webapp import create_app
-from webapp import db
-from webapp.blog.models import User, Post, Tag
-from config import DevConfig
 import random
 from faker import Faker
+from webapp import create_app
+from webapp import db
+from webapp.auth.models import User  #, Role
+from webapp.blog.models import Post, Tag
+from webapp.auth import bcrypt
+from config import DevConfig
+
 
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 logging.getLogger().setLevel(logging.DEBUG)
@@ -15,12 +18,24 @@ app.app_context().push()
 
 faker = Faker()
 
+fake_users = [
+    {'username': 'user_default', 'role': 'default'},
+    {'username': 'user_poster', 'role': 'poster'},
+    {'username': 'admin', 'role': 'admin'}
+]
+fake_roles = ['default', 'poster', 'admin']
+
 
 def generate_tags(n):
     tags = list()
     for i in range(n):
+        tag_title = faker.color_name()
+        tag = Tag.query.filter_by(title=tag_title).first()
+        if tag:
+            tags.append(tag)
+            continue
         tag = Tag()
-        tag.title = faker.color_name()
+        tag.title = tag_title
         tags.append(tag)
         try:
             db.session.add(tag)
@@ -31,18 +46,44 @@ def generate_tags(n):
     return tags
 
 
-def generate_users(n):
+"""
+def generate_roles():
+    roles = list()
+    for rolename in fake_roles:
+        role = Role.query.filter_by(name=rolename).first()
+        if role:
+            roles.append(role)
+            continue
+        role = Role(rolename)
+        roles.append(role)
+        db.session.add(role)
+        try:
+            db.session.commit()
+        except Exception as e:
+            log.error("Erro inserting role: %s, %s" % (str(role),e))
+            db.session.rollback()
+    return roles
+"""
+
+
+def generate_users():
     users = list()
-    for i in range(n):
+    for item in fake_users:
+        user = User.query.filter_by(username=item['username']).first()
+        if user:
+            users.append(user)
+            continue
         user = User()
-        user.username = faker.name()
-        user.password = "password"
+        #poster = Role.query.filter_by(name=item['role']).one()
+        #user.roles.append(poster)
+        user.username = item['username']
+        user.password = bcrypt.generate_password_hash("password")
         users.append(user)
         try:
             db.session.add(user)
             db.session.commit()
         except Exception as e:
-            log.error("Fail to add user %s: %s" % (str(user), e))
+            log.error("Eror inserting user: %s, %s" % (str(user), e))
             db.session.rollback()
     return users
 
@@ -62,4 +103,5 @@ def generate_posts(n, users, tags):
             log.error("Fail to add post %s: %s" % (str(post), e))
             db.session.rollback()
 
-generate_posts(100, generate_users(10), generate_tags(5))
+#generate_roles()
+generate_posts(100, generate_users(), generate_tags(5))

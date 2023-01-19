@@ -8,3 +8,10 @@ class CommentForm(Form):
         validators=[DataRequired(), Length(max=255)]
     )
     text = TextAreaField(u'Comment', validators=[DataRequired()])
+    
+class PostForm(Form):
+    title = StringField('Title', [
+        DataRequired(),
+        Length(max=255)
+    ])
+    text = TextAreaField('Content', [DataRequired()])

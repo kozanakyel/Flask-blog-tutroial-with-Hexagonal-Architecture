@@ -5,12 +5,16 @@ from dotenv import load_dotenv
 
 load_dotenv() 
 SECRET_KEY_ENV = os.getenv('SECRET_KEY')
+RECAPTCHA_PUBLIC_KEY_ENV = os.getenv('RECAPTCHA_PUBLIC_KEY')
+RECAPTCHA_PRIVATE_KEY_ENV = os.getenv('RECAPTCHA_PRIVATE_KEY')
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
     SECRET_KEY = SECRET_KEY_ENV
+    RECAPTCHA_PUBLIC_KEY = RECAPTCHA_PUBLIC_KEY_ENV
+    RECAPTCHA_PRIVATE_KEY = RECAPTCHA_PRIVATE_KEY_ENV
     POSTS_PER_PAGE = 10
 
 
