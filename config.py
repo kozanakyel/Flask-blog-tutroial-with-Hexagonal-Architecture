@@ -1,12 +1,16 @@
 #source /home/kozan/.pyenv/versions/flask-venv/bin/activate
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv() 
+SECRET_KEY_ENV = os.getenv('SECRET_KEY')
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
-    SECRET_KEY = '736670cb10a600b695a55839ca3a5aa54a7d7356cdef815d2ad6e19a2031182b'
+    SECRET_KEY = SECRET_KEY_ENV
     POSTS_PER_PAGE = 10
 
 
