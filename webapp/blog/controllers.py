@@ -56,7 +56,7 @@ def post(post_id):
             db.session.rollback()
         else:
             flash('Comment added', 'info')
-        return redirect(url_for('post', post_id=post_id))
+        return redirect(url_for('blog.post', post_id=post_id))
     
     post = Post.query.get_or_404(post_id)
     tags = post.tags

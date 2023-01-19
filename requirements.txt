@@ -3,4 +3,6 @@ Flask-sqlalchemy
 Flask-Migrate
 psycopg2-binary
 Faker
-Flask-WTF==0.14.2
+Flask-WTF
+python-dotenv
+flask-login
