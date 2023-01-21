@@ -5,6 +5,7 @@ from flask_login import current_user
 from flask_login import LoginManager, login_user
 from flask_bcrypt import Bcrypt
 from flask_login import AnonymousUserMixin
+from flask_jwt_extended import JWTManager
 
 
 class BlogAnonymous(AnonymousUserMixin):
@@ -13,6 +14,7 @@ class BlogAnonymous(AnonymousUserMixin):
 
 bcrypt = Bcrypt()
 #oid = OpenID()
+jwt = JWTManager()
 
 login_manager = LoginManager()
 login_manager.login_view = "auth.login"
@@ -26,6 +28,7 @@ def create_module(app, **kwargs):
     bcrypt.init_app(app)
     #oid.init_app(app)
     login_manager.init_app(app)
+    jwt.init_app(app)
 
     from .controllers import auth_blueprint
     app.register_blueprint(auth_blueprint)
@@ -64,5 +67,12 @@ def create_or_login(resp):
     return redirect(url_for('main.index'))
 
 
-    
+def authenticate(username, password):
+    from .models import User
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return None
+    if not user.check_password(password):
+        return None
+    return user    
     

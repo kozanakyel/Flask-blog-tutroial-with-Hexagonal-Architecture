@@ -6,3 +6,5 @@ Faker
 Flask-WTF
 python-dotenv
 flask-login
+Flask-Restful
+flask-jwt-extended
