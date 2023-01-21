@@ -61,7 +61,6 @@ def register():
     #        ask_for=['nickname', 'email'],
     #        ask_for_optional=['fullname']
     #    )
-    print(f'user: {form.username.data}')
     if form.is_submitted() and form.validate():
         new_user = User(form.username.data)
         new_user.set_password(form.password.data)

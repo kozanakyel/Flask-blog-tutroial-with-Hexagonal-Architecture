@@ -30,7 +30,7 @@ def create_module(app, **kwargs):
     from .controllers import auth_blueprint
     app.register_blueprint(auth_blueprint)
 
-
+# study for this method
 def has_role(name):
     def real_decorator(f):
         def wraps(*args, **kwargs):
