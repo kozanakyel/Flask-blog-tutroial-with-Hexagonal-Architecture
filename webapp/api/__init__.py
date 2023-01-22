@@ -8,6 +8,6 @@ def create_module(app, **kwargs):
     rest_api.add_resource(
         PostApi,
         '/api/post',
-        '/api/post/<int:post_id>',
+        '/api/post/<int:post_id>',  # forgtotten leading slash
     )
     rest_api.init_app(app)

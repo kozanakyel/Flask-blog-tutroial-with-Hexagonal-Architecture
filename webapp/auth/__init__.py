@@ -44,6 +44,8 @@ def has_role(name):
         return functools.update_wrapper(wraps, f)
     return real_decorator
 
+def identity(payload):
+    return load_user(payload['identity'])
 
 @login_manager.user_loader
 def load_user(userid):

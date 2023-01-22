@@ -1,10 +1,4 @@
-try:
-    # Try python3
-    from html.parser import HTMLParser
-except Exception as e:
-    # Nop python2
-    from HTMLParser import HTMLParser
-
+from html.parser import HTMLParser   # FOR PYTHON3
 from flask_restful import fields
 
 
@@ -12,6 +6,7 @@ class HTMLStripper(HTMLParser):
     fed = list()
 
     def __init__(self):
+        super().__init__()   #### LAST -1
         self.reset()
         self.fed = []
 
