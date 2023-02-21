@@ -27,5 +27,6 @@ class DevConfig(Config):
     DEBUG = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'database.db')
-    CELERY_BROKER_URL = "amqp://rabbitmq:rabbitmq@localhost//"
-    CELERY_RESULT_BACKEND = "amqp://rabbitmq:rabitmq@localhost//"
+    
+    CELERY_BROKER_URL = "redis://localhost:6379"
+    CELERY_RESULT_BACKEND = "redis://localhost:6379"
